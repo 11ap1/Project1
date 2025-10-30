@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Loading → Start → Video</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      height: 100vh;
+      width: 100%;
+      background-color: black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+    }
+
+    /* LOADING SCREEN */
+    .loading-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: black;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+      opacity: 1;
+      transition: opacity 1s ease;
+    }
+
+    .loading-text {
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+    }
+
+    .progress-container {
+      width: 70%;
+      height: 15px;
+      background-color: #222;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background-color: #007bff;
+      transition: width 0.4s ease;
+    }
+
+    /* START BUTTON */
+    #startButton {
+      display: none;
+      margin-top: 30px;
+      padding: 10px 25px;
+      font-size: 1.2rem;
+      color: white;
+      background-color: #007bff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    #startButton:hover {
+      background-color: #0056b3;
+    }
+
+    /* FADE BLACK SCREEN */
+    .fade-black {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: black;
+      opacity: 0;
+      transition: opacity 1.5s ease;
+      z-index: 5;
+      pointer-events: none;
+    }
+
+    /* VIDEO */
+    video {
+      opacity: 0;
+      transition: opacity 2s ease;
+      display: none;
+      max-width: 80%;
+      max-height: 80%;
+      border-radius: 10px;
+      box-shadow: 0 0 25px rgba(0, 0, 0, 0.8);
+    }
+
+    /* Center video on desktop */
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* Fullscreen on mobile */
+    @media (max-width: 768px) {
+      video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 0;
+        box-shadow: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- LOADING SCREEN -->
+  <div class="loading-screen" id="loadingScreen">
+    <div class="loading-text">
+      Wait... Loading <span id="percent">0%</span>
+    </div>
+    <div class="progress-container">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+    <button id="startButton">Start ▶</button>
+  </div>
+
+  <!-- FADE BLACK -->
+  <div class="fade-black" id="fadeBlack"></div>
+
+  <!-- VIDEO -->
+  <video id="myVideo" src="7c3ed268-cd8d-461b-9b61-1056584ecacf.mp4" playsinline></video>
+
+  <!-- AUDIO -->
+  <audio id="myAudio" src="barzaga.mp3"></audio>
+
+  <script>
+    const loadingScreen = document.getElementById('loadingScreen');
+    const percentText = document.getElementById('percent');
+    const progressBar = document.getElementById('progressBar');
+    const startButton = document.getElementById('startButton');
+    const video = document.getElementById('myVideo');
+    const audio = document.getElementById('myAudio');
+    const fadeBlack = document.getElementById('fadeBlack');
+
+    const progressSteps = [10, 20, 26, 49, 69, 80, 100];
+    let step = 0;
+
+    // Simulate loading
+    function updateProgress() {
+      if (step < progressSteps.length) {
+        const value = progressSteps[step];
+        percentText.textContent = value + "%";
+        progressBar.style.width = value + "%";
+        step++;
+        setTimeout(updateProgress, 600);
+      } else {
+        // Loading done
+        setTimeout(() => {
+          startButton.style.display = "inline-block"; // show start button
+          percentText.textContent = "100%";
+        }, 500);
+      }
+    }
+
+    window.addEventListener("load", updateProgress);
+
+    // When "Start" button clicked
+    startButton.addEventListener("click", () => {
+      startButton.disabled = true;
+      loadingScreen.style.opacity = "0";
+
+      setTimeout(() => {
+        loadingScreen.style.display = "none";
+        fadeBlack.style.opacity = "1"; // fade to black
+        setTimeout(() => {
+          fadeBlack.style.opacity = "0"; // fade out
+          video.style.display = "block";
+          video.play();
+          audio.play();
+          setTimeout(() => {
+            video.style.opacity = "1";
+          }, 200);
+        }, 1200);
+      }, 800);
+    });
+  </script>
+</body>
+</html>
